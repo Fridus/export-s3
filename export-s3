@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 TARBALL_NAME=$1
 DIRECTORY=$2
