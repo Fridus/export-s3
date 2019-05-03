@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+TARBALL_NAME=$1
+DIRECTORY=$2
+DIR=$(pwd)
+S3_PATH=$3
+
+set -e
+
+###############
+# VALIDATION
+###############
+
+if [[ -z $TARBALL_NAME ]]; then
+  echo "Missing tarball name"
+  exit 1
+fi
+
+if [[ -z $DIRECTORY ]]; then
+  echo "Missing directory to export"
+  exit 1
+fi
+
+if [[ -z $S3_PATH ]]; then
+  echo "Missing S3_PATH"
+  exit 1
+fi
+
+DIR_TO_EXPORT="${DIR}/${DIRECTORY}"
+
+if [[ -d $DIR_TO_EXPORT ]]; then
+  echo "Export directory : ${DIR_TO_EXPORT} ..."
+else
+  echo "${DIRECTORY} does not exists or is not a directory"
+  exit 2
+fi
+
+###############
+# BEGIN
+###############
+
+tar -cf $TARBALL_NAME -C $DIR_TO_EXPORT .
+
+aws s3 cp $TARBALL_NAME s3://$S3_PATH/$TARBALL_NAME
+aws s3 presign s3://$S3_PATH/$TARBALL_NAME
+
+rm $TARBALL_NAME
+
+exit 0
